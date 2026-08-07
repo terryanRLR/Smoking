@@ -1,78 +1,80 @@
 # 생체 신호 기반 흡연 여부 비교 시각화 프로젝트
 
-> 내일배움캠프 QA/QC 5기 · 8조 88하조
-> 팀장: 이지아 · 팀원: 박재경, 안영진, 유지수, 이근주
+내일배움캠프 QA/QC 5기 · 8조(88하조) 팀 과제 — [바이오] Smoker Status
+Prediction Dataset을 활용해, 흡연 여부에 따른 건강 지표 차이를 검증하고
+시각화한 프로젝트입니다.
 
-건강검진 생체 신호 데이터를 활용해 흡연자와 비흡연자의 주요 건강 지표 차이를 EDA·통계 검정·시각화로 분석한 팀 프로젝트입니다. 이 저장소는 발표 이후 팀원들의 흩어진 산출물(기획서·발표자료·개별 실험 노트북)을 역추적해 재구성했습니다.
+> **이 저장소에 대하여**
+> 이 저장소는 팀이 남긴 산출물(기획서, 발표자료, 통합 분석 노트북, 튜터
+> 피드백)을 팀원 중 한 명이 사후적으로 정리·재구성한 것입니다. 원본
+> 노트북은 여러 사람의 작업이 하나의 파일로 합쳐지면서 순서가 뒤섞여 있었고,
+> 이 저장소에서는 그것을 주제별로 나누고, 코드 안에 남아 있던 버전 차이와
+> 논리적 흐름을 추적해 문서로 정리했습니다. 각 문서에 근거를 명시했으니
+> "무엇이 원본 그대로이고 무엇이 이번에 재구성됐는지"는 `docs/` 안에서
+> 확인할 수 있습니다.
 
 ## 핵심 결과 요약
 
-전처리 데이터 기준 흡연자 vs 비흡연자 평균 비교:
+데이터: 건강검진 38,984건 → 전처리 후 38,740건 (흡연자 36.7%)
 
-| 지표 | 비흡연자 | 흡연자 | 차이 |
-|---|---|---|---|
-| 헤모글로빈 (g/dL) | 14.14 | 15.45 | +1.31 |
-| HDL | 59.3 | 53.8 | −5.5 |
-| AST (U/L) | 25.0 | 27.4 | +2.3 |
-| ALT (U/L) | 24.4 | 30.7 | +6.3 |
-| γ-GTP (U/L) | 30.3 | 53.3 | +23.0 (차이 가장 큼) |
+| 가설 | 결과 |
+|---|---|
+| 1. 흡연은 혈관 건강지표를 악화시킬 것이다 | **지지** — 흡연자는 헤모글로빈 +1.28 g/dL, 수축기 혈압 +2.0, HDL 5.5 낮음 |
+| 2. 흡연은 간 기능 저하를 유발할 것이다 | **지지** — 흡연자 γ-GTP +22.0, ALT +6.2, AST +2.2 (U/L) |
+| 3. 고BMI 집단은 흡연의 악영향을 더 크게 받을 것이다 | **지지** — 고도비만+흡연 집단에서 γ-GTP 격차 28.7(최대), 허리둘레·중성지방도 동반 증가 |
 
-고BMI 집단에서 흡연 시 γ-GTP 차이가 최대 62%까지 벌어지는 등, **고BMI × 흡연의 결합 효과가 단일 요인보다 크게 나타남**을 확인했습니다. 자세한 결론과 한계는 `slides/presentation.pdf` 및 `docs/02_analysis_pipeline.md`를 참고하세요.
+최종 결론: **고BMI + 흡연** 집단을 우선 개입 타겟으로 선정하고, 간 기능
+추적검사 + 허리둘레 관리 + 금연 상담을 묶은 패키지형 개입을 제안함
+(자세한 내용은 `slides/`, `docs/02_analysis_pipeline.md` 참고).
+
+이 분석에는 뚜렷한 한계도 있습니다 — 성별 변수 부재, 단면 데이터(인과관계
+확인 불가), 음주·운동 등 생활습관 변수 미포함 등. 자세한 내용은
+`docs/03_issues_and_troubleshooting.md`의 Issue 6과 발표자료 7번 섹션을
+참고하세요.
 
 ## 폴더 구조
 
 ```
 .
 ├── README.md
-├── requirements.txt
-├── data/
-│   └── train_dataset.csv                  # 원본 데이터 (Kaggle Smoker Status Prediction)
-├── notebooks/
-│   ├── team_final/                        # 팀 공식 통합 노트북 — 실제 발표자료 제작에 쓰인 코드
-│   │   ├── 01_eda_and_hypotheses.ipynb            # 전처리·상관관계·가설1~3·BMI그룹 히트맵
-│   │   └── 02_statistical_modeling_and_risk_score.ipynb  # 상관분석 p값·OLS 상호작용·위험지수
-│   └── individual/                        # 팀원별 실험 노트북 — 최종 발표에는 미반영
-│       └── member_exploration_alt_preprocessing.ipynb
 ├── docs/
-│   ├── 01_project_plan.md                 # 기획서 정리
-│   ├── 02_analysis_pipeline.md            # 노트북 ↔ 발표자료 슬라이드 매핑, 파이프라인 설명
-│   ├── 03_issues_and_troubleshooting.md   # ★ 재현조건→원인→해결까지 추적한 이슈 5건
-│   └── 04_tutor_feedback.md               # 튜터 서면 피드백 + 팀 회고(KPT)
+│   ├── 01_project_plan.md              # 기획서 (질문 정의, 초기 가설 7개, 역할·일정)
+│   ├── 02_analysis_pipeline.md         # 실제 코드 기준 분석 파이프라인 설명
+│   ├── 03_issues_and_troubleshooting.md# 핵심 문서 — 재현조건→원인→해결까지 추적한 이슈 로그
+│   └── 04_tutor_feedback.md            # 튜터 피드백 + KPT 회고 (팀원별)
+├── notebooks/
+│   └── team_final/                     # 원본 통합 노트북을 주제별로 재구성 (6개 파일)
+│       ├── 01_data_load_and_preprocessing.ipynb
+│       ├── 02_correlation_analysis.ipynb
+│       ├── 03_hypothesis1_vascular_health.ipynb
+│       ├── 04_hypothesis2_liver_function.ipynb
+│       ├── 05_hypothesis3_bmi_smoking_interaction.ipynb
+│       └── 06_conclusion_and_risk_scoring.ipynb
 └── slides/
-    └── presentation.pdf                   # 발표자료
+    └── 발표자료.pdf                     # 최종 발표 슬라이드
 ```
 
-## 어디서부터 볼까요
+`notebooks/team_final/`을 먼저 열어보시려면 [`docs/02_analysis_pipeline.md`](docs/02_analysis_pipeline.md)를
+같이 보는 걸 추천합니다 — 왜 노트북마다 "버전 A/B/C" 섹션이 나뉘어 있는지
+설명되어 있습니다. 실행하려면 `train_dataset.csv`(Kaggle)가 필요하며,
+이 저장소에는 데이터 파일이 포함되어 있지 않습니다.
 
-- **프로젝트를 처음 보신다면** → `docs/01_project_plan.md` (기획서) → `slides/presentation.pdf` (발표자료) 순으로
-- **분석 코드가 발표자료와 어떻게 연결되는지 궁금하다면** → `docs/02_analysis_pipeline.md`
-- **노트북 실행 중 에러가 나거나 수치가 안 맞는다면** → `docs/03_issues_and_troubleshooting.md`에서 동일 증상이 이미 정리되어 있는지 먼저 확인
-- **팀 회고나 튜터 피드백** → `docs/04_tutor_feedback.md`
+## 사용한 기술
 
-## 데이터셋
+- **데이터 처리**: pandas, numpy
+- **시각화**: matplotlib, seaborn
+- **통계**: scipy.stats(point-biserial correlation), statsmodels(OLS 회귀,
+  상호작용항, robust standard error)
 
-- 파일: `data/train_dataset.csv`
-- 출처: [Kaggle – Smoker Status Prediction Dataset](https://www.kaggle.com/datasets/gauravduttakiit/smoker-status-prediction)
-- 원본 규모: 38,984행 × 23열. `team_final` 노트북 기준 최종 분석 표본은 33,256~38,740행 (정확한 수치와 그 이유는 `docs/03_issues_and_troubleshooting.md` Issue #1 참고)
+## 팀
 
-## 실행 방법
+이지아(팀장) · 박재경 · 안영진 · 유지수 · 이근주 — 내일배움캠프 QA/QC 5기 8조
 
-```bash
-pip install -r requirements.txt
-jupyter notebook notebooks/team_final/01_eda_and_hypotheses.ipynb
-```
+## 다음 단계
 
-노트북은 원래 Google Colab에서 작성되어 Colab 전용 명령과 `/content/` 경로를 포함합니다. 로컬 실행 시 주의사항은 `docs/03_issues_and_troubleshooting.md` Issue #5를 참고하세요.
-
-## 팀 역할 분담
-
-| 역할 | 담당 |
-|---|---|
-| 문제 정의 및 분석 기획 | 이지아, 안영진 |
-| 데이터 전처리 | 박재경, 유지수 |
-| EDA 및 시각화 | 박재경, 이근주 |
-| 인사이트 정리 및 결과 해석 | 이근주, 유지수 |
-| 발표 자료 작성·발표·녹화 | 이지아, 안영진 |
-| 문서 정리 및 일정 관리 | 이지아 |
-
-전체 기획 배경은 `docs/01_project_plan.md`에 정리되어 있습니다.
+이 저장소는 팀 산출물 정리이며, 이 데이터를 활용한 개인 후속 프로젝트로
+인터랙티브 대시보드(`smoking-biosignal-dashboard`)를 별도로 제작했습니다.
+실제 `train_dataset.csv`를 다시 받아 상관관계·회귀분석을 재현했고, 특히
+"고BMI × 흡연 상호작용" 가설(가설 3)은 지표별로 통계적 유의성이 갈린다는
+점을 추가로 밝혀 `docs/03_issues_and_troubleshooting.md`의 Issue 4에도
+반영해두었습니다.
